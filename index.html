@@ -187,7 +187,7 @@ body{
   background:linear-gradient(160deg,#f9f5ff,#f0f8ff);
   display:none;
 }
-.voice-row{display:flex;gap:.5rem;align-items:center}
+#voicewrap .voice-row{display:flex;gap:.5rem;align-items:center}
 #voiceinp{
   font-family:inherit;font-size:15px;flex:1;
   padding:.55rem .9rem;border-radius:12px;
@@ -1427,7 +1427,10 @@ function toggleMic(){
   G.recognition.start();
 }
 
-function show(id){ document.getElementById(id).style.display='flex'; }
+function show(id){
+  const el=document.getElementById(id);
+  el.style.display=(id==='choicewrap')?'flex':'block';
+}
 function hide(id){ document.getElementById(id).style.display='none'; }
 
 // ═══════════════════════════════════════════════════
