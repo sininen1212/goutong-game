@@ -1196,13 +1196,8 @@ let G = {
 //  SPEECH
 // ═══════════════════════════════════════════════════
 function initSpeech(){
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SR) return;
-  G.voiceOk = true;
-  G.recognition = new SR();
-  G.recognition.lang = 'zh-CN';
-  G.recognition.continuous = false;
-  G.recognition.interimResults = false;
+  // recognition now created fresh on each mic click via initRecognition()
+  G.voiceOk = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 }
 
 function speak(text){
@@ -1403,28 +1398,69 @@ function showSummary(){
   });
 }
 
+function initRecognition(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR) return null;
+  const r = new SR();
+  r.lang='zh-CN'; r.continuous=false; r.interimResults=false;
+  r.onresult = e=>{
+    const t = e.results[0][0].transcript;
+    const inp=document.getElementById('voiceinp');
+    const st=document.getElementById('micstatus');
+    const mb=document.getElementById('micbtn');
+    if(inp) inp.value = t;
+    if(st) st.textContent='✅ 听到了：' + t;
+    if(mb) mb.className='';
+    G.listening=false;
+    setTimeout(()=> handleFreeInput(t), 300);
+  };
+  r.onerror = e=>{
+    const st=document.getElementById('micstatus');
+    const mb=document.getElementById('micbtn');
+    G.listening=false;
+    if(mb) mb.className='';
+    if(e.error==='no-speech') {
+      if(st) st.textContent='没听到声音，请再试一次 🎙';
+    } else if(e.error==='not-allowed'){
+      if(st) st.textContent='麦克风被拒绝，请在浏览器设置里允许';
+    } else {
+      if(st) st.textContent='出错了(' + e.error + ')，请再试一次 🎙';
+    }
+  };
+  r.onend = ()=>{
+    G.listening=false;
+    const mb=document.getElementById('micbtn');
+    if(mb) mb.className='';
+  };
+  return r;
+}
+
 function toggleMic(){
-  if(!G.recognition) return;
-  const mb = document.getElementById('micbtn');
-  const inp = document.getElementById('voiceinp');
-  const st = document.getElementById('micstatus');
-  if(G.listening){
-    G.recognition.stop(); G.listening=false;
-    mb.className=''; st.textContent='已停止';
+  const mb=document.getElementById('micbtn');
+  const st=document.getElementById('micstatus');
+  if(G.listening && G.recognition){
+    G.recognition.stop();
+    G.listening=false;
+    if(mb) mb.className='';
+    if(st) st.textContent='已停止';
     return;
   }
-  G.listening=true; mb.className='listening';
-  st.textContent='🔴 正在听……孩子请说话';
-  G.recognition.onresult = e=>{
-    const t = e.results[0][0].transcript;
-    inp.value = t;
-    G.listening=false; mb.className='';
-    st.textContent='✅ 识别成功：' + t + '　（正在判断…）';
-    setTimeout(()=> handleFreeInput(t), 500);
-  };
-  G.recognition.onerror = ()=>{ G.listening=false; mb.className=''; st.textContent='没听清，请再试一次 🎙'; };
-  G.recognition.onend = ()=>{ G.listening=false; mb.className=''; };
-  G.recognition.start();
+  // 每次重新创建，避免状态残留
+  G.recognition = initRecognition();
+  if(!G.recognition){
+    if(st) st.textContent='此浏览器不支持语音识别，请用Chrome';
+    return;
+  }
+  G.listening=true;
+  if(mb) mb.className='listening';
+  if(st) st.textContent='🔴 正在听……请说话';
+  try{
+    G.recognition.start();
+  } catch(e){
+    G.listening=false;
+    if(mb) mb.className='';
+    if(st) st.textContent='启动失败，请再点一次 🎙';
+  }
 }
 
 function show(id){
