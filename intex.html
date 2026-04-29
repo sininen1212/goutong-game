@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一天礼貌大冒险</title>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#fff8f0;--peach:#ffb899;--blush:#ffcfb3;
+  --lavender:#e8d5f5;--purple:#9b72cf;--dpurple:#6b3fa0;
+  --mint:#c8f0e0;--green:#5cb88a;--sky:#d0eeff;--blue:#6aaed6;
+  --yellow:#fff3b0;--gold:#f5c842;--coral:#ff8c7a;
+  --text:#3d2a1e;--subtext:#7a5c4a;
+}
+body{
+  font-family:'Ma Shan Zheng','ZCOOL XiaoWei',serif;
+  background:var(--cream);
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:1rem;
+}
+#app{
+  width:100%;max-width:680px;
+  border-radius:24px;
+  overflow:hidden;
+  box-shadow:0 20px 60px rgba(155,114,207,0.25),0 4px 16px rgba(0,0,0,0.08);
+  background:#fff;
+}
+
+/* ══ INTRO ══════════════════════════════════════════ */
+#intro{
+  min-height:580px;
+  background:linear-gradient(160deg,#fff0fa 0%,#ffe8f5 30%,#e8d5f5 60%,#d0eeff 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:2.5rem 2rem;gap:1.4rem;position:relative;overflow:hidden;
+}
+.intro-deco{position:absolute;opacity:.18;font-size:80px;pointer-events:none}
+.intro-deco.d1{top:-10px;left:-10px;transform:rotate(-20deg)}
+.intro-deco.d2{bottom:20px;right:-10px;transform:rotate(15deg);font-size:60px}
+.intro-deco.d3{top:30%;left:5%;font-size:40px}
+.intro-deco.d4{top:20%;right:8%;font-size:36px}
+.intro-mascot{width:140px;height:140px;filter:drop-shadow(0 8px 16px rgba(155,114,207,.3))}
+.intro-title{
+  font-size:34px;color:var(--dpurple);text-align:center;
+  line-height:1.3;text-shadow:2px 3px 0 rgba(155,114,207,.2);
+}
+.intro-subtitle{
+  font-size:15px;color:var(--subtext);text-align:center;
+  background:rgba(255,255,255,.7);border-radius:16px;
+  padding:.6rem 1.2rem;border:1.5px solid rgba(155,114,207,.2);
+  line-height:1.7;max-width:300px;
+}
+.magic-word{
+  display:inline-block;
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  color:#fff;border-radius:20px;padding:.2rem .9rem;
+  font-size:17px;margin:.2rem 0;
+}
+.name-section{display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.name-label{font-size:16px;color:var(--subtext)}
+.name-inp{
+  font-family:inherit;font-size:18px;
+  padding:.55rem 1.2rem;border-radius:30px;
+  border:2px solid var(--lavender);outline:none;
+  background:#fff;color:var(--text);
+  width:180px;text-align:center;
+  transition:border-color .2s;
+}
+.name-inp:focus{border-color:var(--purple)}
+.name-inp::placeholder{color:#c4b5d4;font-size:15px}
+.start-btn{
+  font-family:inherit;font-size:19px;
+  padding:.7rem 2.5rem;border-radius:50px;
+  border:none;
+  background:linear-gradient(135deg,#b47fd4,#7ab8e8);
+  color:#fff;cursor:pointer;
+  box-shadow:0 6px 20px rgba(155,114,207,.4),0 2px 6px rgba(0,0,0,.1);
+  transition:transform .15s,box-shadow .15s;letter-spacing:.5px;
+}
+.start-btn:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 10px 28px rgba(155,114,207,.5)}
+.start-btn:active{transform:scale(.97)}
+
+/* ══ GAME ════════════════════════════════════════════ */
+#game{display:none;flex-direction:column}
+
+/* progress */
+#topbar{
+  display:flex;align-items:center;gap:.6rem;
+  padding:.7rem 1.2rem;
+  background:linear-gradient(90deg,#f3e8ff,#e0f0ff);
+  border-bottom:1.5px solid rgba(155,114,207,.15);
+}
+.scene-tag{
+  font-size:13px;color:var(--dpurple);
+  background:rgba(155,114,207,.12);
+  border-radius:12px;padding:.2rem .8rem;
+  border:1px solid rgba(155,114,207,.2);
+}
+.prog-dots{display:flex;gap:5px;margin-left:auto}
+.pdot{
+  width:12px;height:12px;border-radius:50%;
+  background:#ddd;transition:all .3s;
+}
+.pdot.done{background:var(--green)}
+.pdot.active{background:var(--purple);box-shadow:0 0 0 3px rgba(155,114,207,.3)}
+
+/* scene bg */
+#scenewrap{position:relative;width:100%;height:310px;overflow:hidden;flex-shrink:0}
+#scenesvg{width:100%;height:100%}
+/* character - positioned right side like otome game */
+#charwrap{
+  position:absolute;bottom:0;right:12%;
+  width:200px;height:290px;
+  transition:opacity .5s,transform .5s;
+  filter:drop-shadow(0 8px 20px rgba(0,0,0,.12));
+}
+#charsvg{width:200px;height:290px}
+
+/* dialog */
+#dialogwrap{
+  position:relative;
+  background:linear-gradient(160deg,rgba(255,250,240,.97),rgba(255,240,255,.97));
+  border-top:2.5px solid rgba(155,114,207,.2);
+  padding:1rem 1.2rem 1rem;
+  min-height:100px;
+}
+#npcnamebadge{
+  display:inline-flex;align-items:center;gap:.4rem;
+  font-size:16px;font-weight:bold;color:var(--dpurple);
+  background:linear-gradient(135deg,#ede8ff,#dff0ff);
+  border-radius:20px;padding:.25rem 1rem;margin-bottom:.5rem;
+  border:1.5px solid rgba(155,114,207,.25);
+  box-shadow:0 2px 8px rgba(155,114,207,.15);
+}
+#dialogtext{
+  font-size:17px;color:var(--text);line-height:1.8;min-height:52px;
+}
+#speakbtn{
+  position:absolute;top:.8rem;right:1rem;
+  background:linear-gradient(135deg,#e8d5f5,#d0eeff);
+  border:1.5px solid rgba(155,114,207,.3);
+  border-radius:50%;width:36px;height:36px;
+  cursor:pointer;font-size:17px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+#speakbtn:hover{transform:scale(1.1);background:linear-gradient(135deg,#d8c5f5,#b8d8ff)}
+#speakbtn.speaking{animation:speakpulse .8s infinite}
+@keyframes speakpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.92)}}
+
+/* choices */
+#choicewrap{
+  padding:.8rem 1.2rem;
+  background:linear-gradient(160deg,#f9f5ff,#f0f8ff);
+  border-top:1.5px solid rgba(155,114,207,.12);
+  display:none;flex-direction:column;gap:.5rem;
+}
+.choice-label{font-size:13px;color:var(--subtext);margin-bottom:.1rem}
+.cbtn{
+  font-family:inherit;font-size:15px;
+  text-align:left;padding:.65rem 1rem .65rem 1.2rem;
+  border-radius:14px;border:2px solid rgba(155,114,207,.2);
+  background:#fff;color:var(--text);cursor:pointer;
+  transition:all .18s;line-height:1.5;
+  position:relative;overflow:hidden;
+}
+.cbtn::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:4px;background:linear-gradient(180deg,var(--purple),var(--blue));
+  opacity:0;transition:opacity .2s;
+}
+.cbtn:hover{
+  background:linear-gradient(135deg,#f3ecff,#ebf5ff);
+  border-color:rgba(155,114,207,.45);transform:translateX(3px);
+}
+.cbtn:hover::before{opacity:1}
+.cbtn.correct{background:#edfff5;border-color:#5cb88a;color:#2d6b4a}
+.cbtn.correct::before{opacity:1;background:var(--green)}
+.cbtn.wrong{background:#fff0ee;border-color:#ff8c7a;color:#8b2a1a}
+.cbtn.wrong::before{opacity:1;background:var(--coral)}
+
+/* voice input */
+#voicewrap{
+  padding:.5rem 1.2rem .9rem;
+  background:linear-gradient(160deg,#f9f5ff,#f0f8ff);
+  display:none;
+}
+#voicewrap .voice-row{display:flex;gap:.5rem;align-items:center}
+#voiceinp{
+  font-family:inherit;font-size:15px;flex:1;
+  padding:.55rem .9rem;border-radius:12px;
+  border:1.5px solid rgba(155,114,207,.3);
+  background:#fff;color:var(--text);outline:none;
+  transition:border-color .2s;
+}
+#voiceinp:focus{border-color:var(--purple)}
+#micbtn{
+  background:linear-gradient(135deg,#e8d5f5,#d0eeff);
+  border:1.5px solid rgba(155,114,207,.3);
+  border-radius:50%;width:40px;height:40px;font-size:20px;
+  cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+#micbtn:hover{transform:scale(1.08)}
+#micbtn.listening{background:linear-gradient(135deg,#ffd5d0,#ffb3aa);animation:speakpulse .8s infinite}
+#micstatus{font-size:12px;color:var(--subtext);margin-top:.3rem;min-height:16px}
+#submbtn{
+  font-family:inherit;font-size:14px;
+  padding:.45rem 1rem;border-radius:10px;
+  border:1.5px solid var(--purple);
+  background:linear-gradient(135deg,#ede8ff,#dff0ff);
+  color:var(--dpurple);cursor:pointer;
+  transition:all .18s;
+}
+#submbtn:hover{background:linear-gradient(135deg,#d8c5f5,#c8e4ff)}
+
+/* feedback */
+#feedbackwrap{
+  padding:.9rem 1.2rem;
+  display:none;font-size:15px;line-height:1.7;
+}
+#feedbackwrap.success{
+  background:linear-gradient(135deg,#edfff5,#e0fff0);
+  color:#1d6640;border-top:2px solid #5cb88a;
+}
+#feedbackwrap.fail{
+  background:linear-gradient(135deg,#fffbec,#fff8e0);
+  color:#7a4a00;border-top:2px solid var(--gold);
+}
+.feedback-icon{font-size:20px;margin-right:.4rem}
+
+/* next button */
+#nextbtn{
+  font-family:inherit;font-size:16px;
+  padding:.6rem 1.8rem;border-radius:30px;
+  border:none;
+  background:linear-gradient(135deg,#b47fd4,#7ab8e8);
+  color:#fff;cursor:pointer;margin:.6rem 1.2rem .9rem;
+  box-shadow:0 4px 14px rgba(155,114,207,.35);
+  transition:all .18s;display:none;align-self:flex-start;
+  letter-spacing:.3px;
+}
+#nextbtn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(155,114,207,.45)}
+
+/* ══ SUMMARY ═══════════════════════════════════════ */
+#summary{
+  display:none;flex-direction:column;align-items:center;
+  padding:2.5rem 1.5rem;gap:1.2rem;
+  background:linear-gradient(160deg,#fff0fa,#ffe8f5 30%,#e8d5f5 60%,#d0eeff 100%);
+  min-height:480px;
+}
+.sum-title{font-size:28px;color:var(--dpurple);text-align:center}
+.sum-cards{display:flex;flex-direction:column;gap:.6rem;width:100%;max-width:340px}
+.sum-card{
+  display:flex;align-items:center;gap:.8rem;
+  background:rgba(255,255,255,.8);border-radius:16px;
+  padding:.75rem 1.2rem;font-size:16px;color:var(--text);
+  border:1.5px solid rgba(155,114,207,.2);
+  box-shadow:0 3px 10px rgba(155,114,207,.1);
+}
+.sum-check{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,#5cb88a,#3da870);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:16px;flex-shrink:0;
+}
+.sum-msg{
+  font-size:15px;color:var(--subtext);text-align:center;
+  background:rgba(255,255,255,.7);border-radius:16px;
+  padding:.8rem 1.3rem;max-width:310px;line-height:1.8;
+  border:1.5px solid rgba(155,114,207,.15);
+}
+.restart-btn{
+  font-family:inherit;font-size:17px;
+  padding:.65rem 2.2rem;border-radius:40px;border:none;
+  background:linear-gradient(135deg,#b47fd4,#7ab8e8);
+  color:#fff;cursor:pointer;margin-top:.3rem;
+  box-shadow:0 6px 18px rgba(155,114,207,.35);
+  transition:all .18s;
+}
+.restart-btn:hover{transform:translateY(-2px)}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ══ INTRO ══ -->
+<div id="intro">
+  <div class="intro-deco d1">🌸</div>
+  <div class="intro-deco d2">⭐</div>
+  <div class="intro-deco d3">🌿</div>
+  <div class="intro-deco d4">🦋</div>
+  <!-- Mascot character SVG -->
+  <svg class="intro-mascot" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+    <!-- body -->
+    <ellipse cx="70" cy="105" rx="32" ry="28" fill="#ffd0e8"/>
+    <!-- dress detail -->
+    <ellipse cx="70" cy="108" rx="28" ry="22" fill="#f9b8d8"/>
+    <!-- collar bow -->
+    <ellipse cx="60" cy="83" rx="8" ry="5" fill="#ff99cc" transform="rotate(-30,60,83)"/>
+    <ellipse cx="80" cy="83" rx="8" ry="5" fill="#ff99cc" transform="rotate(30,80,83)"/>
+    <circle cx="70" cy="82" r="5" fill="#ff99cc"/>
+    <!-- arms -->
+    <ellipse cx="38" cy="100" rx="10" ry="17" fill="#ffe0f0" transform="rotate(15,38,100)"/>
+    <ellipse cx="102" cy="100" rx="10" ry="17" fill="#ffe0f0" transform="rotate(-15,102,100)"/>
+    <!-- legs -->
+    <rect x="54" y="128" width="14" height="10" rx="5" fill="#ffe0f0"/>
+    <rect x="72" y="128" width="14" height="10" rx="5" fill="#ffe0f0"/>
+    <!-- shoes -->
+    <ellipse cx="61" cy="138" rx="10" ry="5" fill="#c084e8"/>
+    <ellipse cx="79" cy="138" rx="10" ry="5" fill="#c084e8"/>
+    <!-- neck -->
+    <rect x="62" y="72" width="16" height="14" rx="5" fill="#ffe8cc"/>
+    <!-- head -->
+    <ellipse cx="70" cy="52" rx="36" ry="34" fill="#ffe8cc"/>
+    <!-- hair back -->
+    <ellipse cx="70" cy="30" rx="36" ry="22" fill="#c084e8"/>
+    <!-- hair sides -->
+    <ellipse cx="36" cy="55" rx="12" ry="20" fill="#c084e8"/>
+    <ellipse cx="104" cy="55" rx="12" ry="20" fill="#c084e8"/>
+    <!-- hair front -->
+    <path d="M40,38 Q55,20 70,22 Q85,20 100,38" fill="#c084e8"/>
+    <!-- bangs -->
+    <path d="M42,42 Q50,30 60,34" fill="#b070d8"/>
+    <path d="M98,42 Q90,30 80,34" fill="#b070d8"/>
+    <!-- hair ribbon -->
+    <ellipse cx="92" cy="28" rx="10" ry="6" fill="#ff99cc" transform="rotate(20,92,28)"/>
+    <ellipse cx="106" cy="24" rx="10" ry="6" fill="#ff99cc" transform="rotate(-15,106,24)"/>
+    <circle cx="99" cy="26" r="5" fill="#ffbbdd"/>
+    <!-- eyes -->
+    <ellipse cx="58" cy="52" rx="8" ry="9" fill="#fff"/>
+    <ellipse cx="82" cy="52" rx="8" ry="9" fill="#fff"/>
+    <ellipse cx="58" cy="54" rx="5.5" ry="6.5" fill="#7040c0"/>
+    <ellipse cx="82" cy="54" rx="5.5" ry="6.5" fill="#7040c0"/>
+    <ellipse cx="58" cy="53" rx="3" ry="3.5" fill="#4a2890"/>
+    <ellipse cx="82" cy="53" rx="3" ry="3.5" fill="#4a2890"/>
+    <circle cx="60" cy="50" r="2" fill="#fff"/>
+    <circle cx="84" cy="50" r="2" fill="#fff"/>
+    <!-- eyelashes -->
+    <path d="M50,46 Q53,42 56,44" stroke="#7040c0" stroke-width="1.5" fill="none"/>
+    <path d="M90,46 Q87,42 84,44" stroke="#7040c0" stroke-width="1.5" fill="none"/>
+    <!-- blush -->
+    <ellipse cx="46" cy="61" rx="9" ry="5" fill="#ffb3c8" opacity=".55"/>
+    <ellipse cx="94" cy="61" rx="9" ry="5" fill="#ffb3c8" opacity=".55"/>
+    <!-- nose -->
+    <ellipse cx="70" cy="62" rx="3" ry="2" fill="#f5a88a" opacity=".6"/>
+    <!-- mouth happy -->
+    <path d="M61,70 Q70,78 79,70" stroke="#d4607a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <!-- stars decoration -->
+    <text x="15" y="28" font-size="14" fill="#ffd700" opacity=".8">✦</text>
+    <text x="110" y="20" font-size="10" fill="#ffd700" opacity=".7">✦</text>
+  </svg>
+
+  <div class="intro-title">✨ 一天礼貌大冒险 ✨</div>
+  <div class="intro-subtitle">
+    学会魔法语言<br>
+    <span class="magic-word">「请……好吗？」</span><br>
+    顺利度过美好的一天！
+  </div>
+  <div class="name-section">
+    <div class="name-label">👋 你叫什么名字呀？</div>
+    <input class="name-inp" id="nameinp" placeholder="输入你的名字" maxlength="6">
+  </div>
+  <button class="start-btn" id="startbtn">出发冒险！🌟</button>
+</div>
+
+<!-- ══ GAME ══ -->
+<div id="game">
+  <div id="topbar">
+    <span class="scene-tag" id="scenetag">🏠 场景一</span>
+    <div class="prog-dots">
+      <div class="pdot active" id="pd0"></div>
+      <div class="pdot" id="pd1"></div>
+      <div class="pdot" id="pd2"></div>
+    </div>
+  </div>
+
+  <div id="scenewrap">
+    <svg id="scenesvg" viewBox="0 0 680 310" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="charwrap">
+      <svg id="charsvg" viewBox="0 0 200 290" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+  </div>
+
+  <div id="dialogwrap">
+    <div id="npcnamebadge">🌸 旁白</div>
+    <div id="dialogtext"></div>
+    <button id="speakbtn" title="朗读这段话">🔊</button>
+  </div>
+
+  <div id="feedbackwrap"></div>
+
+  <div id="choicewrap">
+    <div class="choice-label">💬 你会怎么说？选一个吧：</div>
+    <button class="cbtn" id="cb0"></button>
+    <button class="cbtn" id="cb1"></button>
+    <button class="cbtn" id="cb2"></button>
+  </div>
+
+  <div id="voicewrap">
+    <div class="voice-row">
+      <input id="voiceinp" placeholder="🎤 也可以说出来，或者打字...">
+      <button id="micbtn" title="点击说话">🎙</button>
+      <button id="submbtn">提交</button>
+    </div>
+    <div id="micstatus">点击 🎙 让孩子说出礼貌的话</div>
+  </div>
+
+  <button id="nextbtn"></button>
+</div>
+
+<!-- ══ SUMMARY ══ -->
+<div id="summary">
+  <div style="font-size:48px">🎊</div>
+  <div class="sum-title">礼貌大冒险完成！</div>
+  <div class="sum-cards" id="sumcards"></div>
+  <div class="sum-msg">
+    记住魔法语言：<br>
+    <strong>「请……好吗？」</strong><br>
+    让每一天都充满善意和温暖～ 🌸
+  </div>
+  <button class="restart-btn" id="restartbtn">✨ 再玩一次</button>
+</div>
+
+</div><!-- #app -->
+
+<script>
+// ═══════════════════════════════════════════════════
+//  SCENE BACKGROUNDS (detailed SVG illustrations)
+// ═══════════════════════════════════════════════════
+const BACKGROUNDS = {
+
+home: `
+<defs>
+  <linearGradient id="wallg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#fff8f0"/>
+    <stop offset="100%" stop-color="#ffe8d6"/>
+  </linearGradient>
+  <linearGradient id="floorg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#f5d5a8"/>
+    <stop offset="100%" stop-color="#e8c080"/>
+  </linearGradient>
+  <radialGradient id="sunray" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#fff9c0" stop-opacity=".8"/>
+    <stop offset="100%" stop-color="#fff9c0" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+
+<!-- sky/wall -->
+<rect width="680" height="230" fill="url(#wallg)"/>
+<!-- floor -->
+<rect y="228" width="680" height="82" fill="url(#floorg)"/>
+<!-- floor planks -->
+<line x1="0" y1="250" x2="680" y2="250" stroke="#d4a855" stroke-width="1.2" opacity=".4"/>
+<line x1="0" y1="272" x2="680" y2="272" stroke="#d4a855" stroke-width="1.2" opacity=".4"/>
+<line x1="0" y1="294" x2="680" y2="294" stroke="#d4a855" stroke-width="1.2" opacity=".4"/>
+<line x1="120" y1="228" x2="120" y2="310" stroke="#d4a855" stroke-width="1" opacity=".3"/>
+<line x1="280" y1="228" x2="280" y2="310" stroke="#d4a855" stroke-width="1" opacity=".3"/>
+<line x1="450" y1="228" x2="450" y2="310" stroke="#d4a855" stroke-width="1" opacity=".3"/>
+<line x1="600" y1="228" x2="600" y2="310" stroke="#d4a855" stroke-width="1" opacity=".3"/>
+<!-- baseboard -->
+<rect y="224" width="680" height="8" fill="#d4a044" opacity=".5"/>
+
+<!-- WINDOW left -->
+<rect x="40" y="28" width="150" height="165" rx="10" fill="#c8eeff" stroke="#d4aa60" stroke-width="3"/>
+<rect x="40" y="28" width="150" height="165" rx="10" fill="url(#sunray)"/>
+<!-- window frame cross -->
+<rect x="112" y="28" width="6" height="165" rx="2" fill="#d4aa60"/>
+<rect x="40" y="108" width="150" height="6" rx="2" fill="#d4aa60"/>
+<!-- window sill -->
+<rect x="33" y="190" width="164" height="10" rx="4" fill="#c49040"/>
+<!-- sun outside -->
+<circle cx="76" cy="72" r="26" fill="#fff0a0" opacity=".85"/>
+<circle cx="76" cy="72" r="20" fill="#ffe060"/>
+<!-- sun rays -->
+<g stroke="#ffe060" stroke-width="2.5" opacity=".6">
+  <line x1="76" y1="38" x2="76" y2="28"/><line x1="76" y1="106" x2="76" y2="116"/>
+  <line x1="42" y1="72" x2="32" y2="72"/><line x1="110" y1="72" x2="120" y2="72"/>
+  <line x1="51" y1="47" x2="44" y2="40"/><line x1="101" y1="97" x2="108" y2="104"/>
+  <line x1="101" y1="47" x2="108" y2="40"/><line x1="51" y1="97" x2="44" y2="104"/>
+</g>
+<!-- clouds in window -->
+<ellipse cx="130" cy="55" rx="20" ry="10" fill="#fff" opacity=".8"/>
+<ellipse cx="145" cy="52" rx="14" ry="9" fill="#fff" opacity=".8"/>
+<ellipse cx="118" cy="53" rx="12" ry="8" fill="#fff" opacity=".7"/>
+<!-- curtains -->
+<path d="M38,28 Q52,95 44,195" fill="#ffb3cc" opacity=".85"/>
+<path d="M48,28 Q34,95 42,195" fill="#ff99bb" opacity=".7"/>
+<path d="M192,28 Q178,95 186,195" fill="#ffb3cc" opacity=".85"/>
+<path d="M182,28 Q196,95 188,195" fill="#ff99bb" opacity=".7"/>
+<!-- curtain tie-back left -->
+<ellipse cx="46" cy="130" rx="12" ry="8" fill="#ff80aa"/>
+<!-- curtain tie-back right -->
+<ellipse cx="186" cy="130" rx="12" ry="8" fill="#ff80aa"/>
+
+<!-- small potted plant on windowsill -->
+<rect x="150" y="172" width="18" height="16" rx="4" fill="#c084e8" opacity=".8"/>
+<path d="M159,172 Q152,155 148,148 Q156,152 162,160 Q166,150 170,143 Q172,155 164,168" fill="#5cb88a"/>
+<circle cx="158" cy="147" r="4" fill="#ff99aa"/>
+
+<!-- DINING TABLE -->
+<!-- tablecloth shadow -->
+<ellipse cx="400" cy="242" rx="195" ry="10" fill="#c49040" opacity=".2"/>
+<!-- table top -->
+<rect x="210" y="215" width="390" height="18" rx="8" fill="#e8c070"/>
+<rect x="210" y="215" width="390" height="8" rx="4" fill="#f5d080"/>
+<!-- table legs -->
+<rect x="240" y="233" width="18" height="60" rx="7" fill="#c49040"/>
+<rect x="578" y="233" width="18" height="60" rx="7" fill="#c49040"/>
+<!-- table decorative stripe -->
+<rect x="210" y="224" width="390" height="4" rx="2" fill="#d4aa55" opacity=".5"/>
+
+<!-- TABLECLOTH -->
+<rect x="198" y="210" width="414" height="14" rx="6" fill="#fff5e8" opacity=".9"/>
+<rect x="200" y="210" width="410" height="8" rx="4" fill="#fff" opacity=".6"/>
+
+<!-- BREAKFAST ITEMS on table -->
+<!-- bowl of rice/porridge -->
+<ellipse cx="305" cy="212" rx="42" ry="14" fill="#e8d8b8" stroke="#c4a060" stroke-width="2"/>
+<ellipse cx="305" cy="208" rx="36" ry="10" fill="#f8f0d8"/>
+<ellipse cx="305" cy="206" rx="28" ry="7" fill="#fff8e8"/>
+<!-- steam from bowl -->
+<path d="M292,195 Q295,185 292,177" stroke="#ddd" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7"/>
+<path d="M305,193 Q308,182 305,174" stroke="#ddd" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7"/>
+<path d="M318,195 Q321,185 318,177" stroke="#ddd" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7"/>
+
+<!-- chopsticks -->
+<line x1="280" y1="195" x2="310" y2="215" stroke="#c49040" stroke-width="3" stroke-linecap="round"/>
+<line x1="290" y1="192" x2="320" y2="212" stroke="#c49040" stroke-width="3" stroke-linecap="round"/>
+
+<!-- plate with egg -->
+<ellipse cx="380" cy="212" rx="36" ry="11" fill="#fff" stroke="#e8d8c0" stroke-width="1.5"/>
+<ellipse cx="380" cy="210" rx="28" ry="8" fill="#fff8e8"/>
+<circle cx="380" cy="208" r="9" fill="#ffe080"/>
+<circle cx="380" cy="208" r="5" fill="#ff8c00" opacity=".7"/>
+<ellipse cx="376" cy="205" r="2" fill="#fff" opacity=".6"/>
+
+<!-- milk bottle -->
+<rect x="430" y="182" width="24" height="34" rx="5" fill="#f0f8ff" stroke="#c8dff5" stroke-width="1.5"/>
+<rect x="434" y="177" width="16" height="8" rx="3" fill="#e0eeff"/>
+<rect x="436" y="174" width="12" height="5" rx="2" fill="#c8d8f0"/>
+<ellipse cx="442" cy="182" rx="12" ry="4" fill="#d8eeff"/>
+<!-- milk label -->
+<rect x="432" y="190" width="20" height="14" rx="3" fill="#fff" opacity=".8"/>
+<rect x="434" y="192" width="16" height="3" rx="1" fill="#6aaed6"/>
+<rect x="434" y="197" width="12" height="2" rx="1" fill="#aad4f0"/>
+
+<!-- teacup -->
+<rect x="474" y="194" width="30" height="22" rx="5" fill="#ffecd8" stroke="#e8c0a0" stroke-width="1.5"/>
+<ellipse cx="489" cy="194" rx="15" ry="5" fill="#ffd8b8"/>
+<path d="M504,200 Q512,205 504,212" stroke="#e8c0a0" stroke-width="2" fill="none" stroke-linecap="round"/>
+<ellipse cx="489" cy="216" rx="18" ry="5" fill="#e8c0a0" opacity=".4"/>
+<!-- tea steam -->
+<path d="M483,192 Q486,183 483,176" stroke="#ccc" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".6"/>
+<path d="M492,191 Q495,181 492,174" stroke="#ccc" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".6"/>
+
+<!-- small flower vase center table -->
+<rect x="348" y="190" width="14" height="20" rx="5" fill="#b8d8f8"/>
+<rect x="346" y="205" width="18" height="6" rx="3" fill="#a0c8f0"/>
+<circle cx="350" cy="186" r="6" fill="#ffb3cc"/>
+<circle cx="357" cy="182" r="5" fill="#ff99bb"/>
+<circle cx="363" cy="185" r="5" fill="#ffc8d8"/>
+<circle cx="355" cy="188" r="4" fill="#ffddee"/>
+
+<!-- wall decorations -->
+<!-- picture frame -->
+<rect x="460" y="30" width="110" height="80" rx="8" fill="#f5ece0" stroke="#d4aa60" stroke-width="3"/>
+<rect x="468" y="38" width="94" height="64" rx="4" fill="#e8f5e8"/>
+<!-- simple flower drawing in frame -->
+<circle cx="515" cy="70" r="18" fill="#ffe8f0"/>
+<circle cx="497" cy="62" r="10" fill="#ffb3cc"/>
+<circle cx="533" cy="62" r="10" fill="#ffb3cc"/>
+<circle cx="497" cy="78" r="10" fill="#ffb3cc"/>
+<circle cx="533" cy="78" r="10" fill="#ffb3cc"/>
+<circle cx="515" cy="70" r="10" fill="#ff80aa"/>
+<line x1="515" y1="88" x2="515" y2="102" stroke="#5cb88a" stroke-width="2.5"/>
+<ellipse cx="505" cy="96" rx="8" ry="5" fill="#5cb88a" transform="rotate(-30,505,96)"/>
+
+<!-- shelf with items -->
+<rect x="530" y="140" width="130" height="8" rx="3" fill="#d4aa60"/>
+<rect x="525" y="147" width="5" height="40" rx="2" fill="#c49040"/>
+<rect x="655" y="147" width="5" height="40" rx="2" fill="#c49040"/>
+<!-- books on shelf -->
+<rect x="537" y="108" width="16" height="34" rx="2" fill="#ff8080"/>
+<rect x="555" y="112" width="14" height="30" rx="2" fill="#80aaff"/>
+<rect x="571" y="110" width="16" height="32" rx="2" fill="#80cc80"/>
+<rect x="589" y="106" width="18" height="36" rx="2" fill="#ffcc80"/>
+<!-- bookend bear -->
+<circle cx="624" cy="127" r="9" fill="#f5d0a0"/>
+<circle cx="619" cy="121" r="4.5" fill="#f5d0a0"/>
+<circle cx="629" cy="121" r="4.5" fill="#f5d0a0"/>
+<circle cx="619" cy="120" r="2.5" fill="#e8b880"/>
+<circle cx="629" cy="120" r="2.5" fill="#e8b880"/>
+<ellipse cx="624" cy="129" rx="4" ry="3" fill="#e8b880"/>
+<circle cx="622" cy="126" r="1.5" fill="#603018"/>
+<circle cx="626" cy="126" r="1.5" fill="#603018"/>
+<path d="M621,131 Q624,134 627,131" stroke="#aa6040" stroke-width="1.2" fill="none"/>
+
+<!-- small wall clock -->
+<circle cx="390" cy="55" r="28" fill="#fff" stroke="#d4aa60" stroke-width="2.5"/>
+<circle cx="390" cy="55" r="22" fill="#fffaf0"/>
+<line x1="390" y1="38" x2="390" y2="42" stroke="#333" stroke-width="1.5"/>
+<line x1="390" y1="68" x2="390" y2="72" stroke="#333" stroke-width="1.5"/>
+<line x1="373" y1="55" x2="377" y2="55" stroke="#333" stroke-width="1.5"/>
+<line x1="403" y1="55" x2="407" y2="55" stroke="#333" stroke-width="1.5"/>
+<line x1="390" y1="55" x2="390" y2="42" stroke="#333" stroke-width="2"/>
+<line x1="390" y1="55" x2="400" y2="55" stroke="#333" stroke-width="2"/>
+<circle cx="390" cy="55" r="2.5" fill="#d4aa60"/>
+`,
+
+classroom: `
+<defs>
+  <linearGradient id="wallcg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#f0f8ff"/>
+    <stop offset="100%" stop-color="#e0f0ff"/>
+  </linearGradient>
+  <linearGradient id="floorcg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#f8f0e0"/>
+    <stop offset="100%" stop-color="#ead8b0"/>
+  </linearGradient>
+</defs>
+
+<!-- wall -->
+<rect width="680" height="240" fill="url(#wallcg)"/>
+<!-- floor -->
+<rect y="238" width="680" height="72" fill="url(#floorcg)"/>
+<!-- baseboard -->
+<rect y="234" width="680" height="7" fill="#c8a870" opacity=".5"/>
+<!-- floor lines -->
+<line x1="0" y1="258" x2="680" y2="258" stroke="#c8a870" stroke-width="1" opacity=".35"/>
+<line x1="0" y1="278" x2="680" y2="278" stroke="#c8a870" stroke-width="1" opacity=".35"/>
+<line x1="0" y1="298" x2="680" y2="298" stroke="#c8a870" stroke-width="1" opacity=".35"/>
+<line x1="170" y1="238" x2="170" y2="310" stroke="#c8a870" stroke-width="1" opacity=".3"/>
+<line x1="340" y1="238" x2="340" y2="310" stroke="#c8a870" stroke-width="1" opacity=".3"/>
+<line x1="510" y1="238" x2="510" y2="310" stroke="#c8a870" stroke-width="1" opacity=".3"/>
+
+<!-- BLACKBOARD (large, detailed) -->
+<rect x="30" y="18" width="370" height="200" rx="10" fill="#2d6b4a" stroke="#1d4a32" stroke-width="3"/>
+<rect x="40" y="26" width="350" height="184" rx="6" fill="#246040"/>
+<!-- chalk tray -->
+<rect x="30" y="215" width="370" height="10" rx="3" fill="#8B6914"/>
+<rect x="45" y="217" width="18" height="6" rx="2" fill="#f5f5dc" opacity=".9"/>
+<rect x="70" y="217" width="14" height="6" rx="2" fill="#f5f5dc" opacity=".8"/>
+<rect x="90" y="218" width="20" height="5" rx="2" fill="#f5f5dc" opacity=".7"/>
+
+<!-- blackboard content - 请好吗 lesson -->
+<text x="215" y="70" text-anchor="middle" font-size="32" fill="#bbf7d0" font-family="serif" opacity=".95">请……好吗？</text>
+<line x1="65" y1="82" x2="365" y2="82" stroke="#86efac" stroke-width="1.5" opacity=".4"/>
+
+<text x="215" y="108" text-anchor="middle" font-size="16" fill="#86efac" font-family="serif">礼貌沟通的魔法语言</text>
+<text x="130" y="138" font-size="13" fill="#6ee7b7" font-family="serif" opacity=".9">✓ 妈妈，请帮我……好吗？</text>
+<text x="130" y="158" font-size="13" fill="#6ee7b7" font-family="serif" opacity=".9">✓ 老师，请借我……好吗？</text>
+<text x="130" y="178" font-size="13" fill="#6ee7b7" font-family="serif" opacity=".9">✓ 同学，请让我……好吗？</text>
+
+<!-- chalk dust smudge effect -->
+<ellipse cx="80" cy="120" rx="30" ry="15" fill="#86efac" opacity=".05"/>
+<ellipse cx="340" cy="170" rx="20" ry="10" fill="#86efac" opacity=".04"/>
+
+<!-- eraser on tray -->
+<rect x="320" y="217" width="30" height="8" rx="3" fill="#f5d0a0"/>
+<rect x="322" y="217" width="26" height="4" rx="2" fill="#a06030" opacity=".4"/>
+
+<!-- WINDOW right side -->
+<rect x="560" y="22" width="102" height="150" rx="8" fill="#c8eeff" stroke="#c4a050" stroke-width="2.5"/>
+<!-- window cross -->
+<rect x="608" y="22" width="5" height="150" rx="2" fill="#c4a050"/>
+<rect x="560" y="94" width="102" height="5" rx="2" fill="#c4a050"/>
+<!-- window sill -->
+<rect x="554" y="170" width="114" height="9" rx="4" fill="#b49030"/>
+<!-- sky in window -->
+<rect x="562" y="24" width="44" height="68" rx="3" fill="#b8e8ff"/>
+<rect x="614" y="24" width="46" height="68" rx="3" fill="#b8e8ff"/>
+<!-- clouds in window -->
+<ellipse cx="578" cy="40" rx="16" ry="8" fill="#fff" opacity=".85"/>
+<ellipse cx="590" cy="37" rx="12" ry="7" fill="#fff" opacity=".85"/>
+<ellipse cx="630" cy="50" rx="14" ry="7" fill="#fff" opacity=".8"/>
+<!-- tree top visible -->
+<ellipse cx="580" cy="115" rx="22" ry="25" fill="#5cb88a" opacity=".7"/>
+<ellipse cx="598" cy="120" rx="18" ry="22" fill="#4aaa78" opacity=".7"/>
+
+<!-- window potted plant on sill -->
+<rect x="628" y="152" width="20" height="18" rx="5" fill="#ff99aa"/>
+<path d="M638,152 Q628,132 622,122 Q636,130 642,145 Q648,128 652,118 Q654,134 644,150" fill="#5cb88a"/>
+<circle cx="634" cy="120" r="5" fill="#ffcc00"/>
+
+<!-- TEACHER'S DESK (left side, smaller) -->
+<rect x="25" y="232" width="200" height="15" rx="6" fill="#c8a060"/>
+<rect x="25" y="238" width="200" height="8" rx="3" fill="#d4b070"/>
+<rect x="30" y="247" width="16" height="45" rx="5" fill="#b08040"/>
+<rect x="200" y="247" width="16" height="45" rx="5" fill="#b08040"/>
+
+<!-- items on teacher desk -->
+<rect x="55" y="215" width="16" height="20" rx="2" fill="#ff8080"/>
+<rect x="73" y="218" width="14" height="17" rx="2" fill="#80aaff"/>
+<rect x="89" y="216" width="16" height="19" rx="2" fill="#ffcc80"/>
+<!-- apple for teacher -->
+<circle cx="145" cy="225" r="9" fill="#dc2626"/>
+<line x1="145" y1="216" x2="147" y2="210" stroke="#166534" stroke-width="2"/>
+<ellipse cx="150" cy="211" rx="5" ry="3" fill="#166534"/>
+<!-- pencil cup -->
+<rect x="165" y="210" width="22" height="24" rx="5" fill="#e8d0f8"/>
+<line x1="170" y1="210" x2="168" y2="196" stroke="#f5a050" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="175" y1="210" x2="173" y2="194" stroke="#80aaff" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="180" y1="210" x2="182" y2="197" stroke="#ff8080" stroke-width="2.5" stroke-linecap="round"/>
+
+<!-- STUDENT DESKS (background, partial) -->
+<!-- row of desks -->
+<rect x="390" y="225" width="100" height="12" rx="4" fill="#d4b870" opacity=".7"/>
+<rect x="400" y="237" width="12" height="35" rx="3" fill="#c4a860" opacity=".7"/>
+<rect x="474" y="237" width="12" height="35" rx="3" fill="#c4a860" opacity=".7"/>
+<rect x="500" y="225" width="100" height="12" rx="4" fill="#d4b870" opacity=".6"/>
+<rect x="510" y="237" width="12" height="35" rx="3" fill="#c4a860" opacity=".6"/>
+<rect x="584" y="237" width="12" height="35" rx="3" fill="#c4a860" opacity=".6"/>
+
+<!-- books/items on student desks -->
+<rect x="408" y="215" width="20" height="14" rx="2" fill="#ff9999" opacity=".8"/>
+<rect x="432" y="213" width="16" height="16" rx="2" fill="#99bbff" opacity=".8"/>
+<rect x="518" y="215" width="18" height="12" rx="2" fill="#99ddbb" opacity=".8"/>
+
+<!-- BULLETIN BOARD top right -->
+<rect x="430" y="15" width="120" height="100" rx="8" fill="#fef3c7" stroke="#d4aa40" stroke-width="2.5"/>
+<rect x="438" y="23" width="104" height="84" rx="4" fill="#fffbf0"/>
+<!-- pins at corners -->
+<circle cx="440" cy="25" r="4" fill="#ff6060"/>
+<circle cx="544" cy="25" r="4" fill="#60aaff"/>
+<circle cx="440" cy="103" r="4" fill="#60cc80"/>
+<circle cx="544" cy="103" r="4" fill="#ffcc40"/>
+<!-- bulletin board content -->
+<text x="490" y="50" text-anchor="middle" font-size="13" fill="#8b6914" font-family="serif">🌟 本周礼貌之星 🌟</text>
+<rect x="445" y="58" width="90" height="16" rx="4" fill="#ffddee"/>
+<text x="490" y="70" text-anchor="middle" font-size="11" fill="#cc4488" font-family="serif">小明 · 小红 · 小华</text>
+<rect x="445" y="79" width="90" height="16" rx="4" fill="#ddffee"/>
+<text x="490" y="91" text-anchor="middle" font-size="11" fill="#228844" font-family="serif">今天也要有礼貌哦！</text>
+
+<!-- wall clock on side -->
+<circle cx="670" cy="50" r="26" fill="#fff" stroke="#d4aa60" stroke-width="2.5"/>
+<circle cx="670" cy="50" r="20" fill="#fffaf0"/>
+<text x="670" y="38" text-anchor="middle" font-size="8" fill="#888">12</text>
+<text x="670" y="73" text-anchor="middle" font-size="8" fill="#888">6</text>
+<text x="648" y="53" text-anchor="middle" font-size="8" fill="#888">9</text>
+<text x="692" y="53" text-anchor="middle" font-size="8" fill="#888">3</text>
+<line x1="670" y1="50" x2="670" y2="36" stroke="#333" stroke-width="2"/>
+<line x1="670" y1="50" x2="681" y2="50" stroke="#333" stroke-width="2"/>
+<circle cx="670" cy="50" r="2.5" fill="#d4aa60"/>
+`,
+
+hallway: `
+<defs>
+  <linearGradient id="wallhg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#fdf8ff"/>
+    <stop offset="100%" stop-color="#f5edff"/>
+  </linearGradient>
+  <linearGradient id="floorhg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#ede0ff"/>
+    <stop offset="100%" stop-color="#d8c8f8"/>
+  </linearGradient>
+  <linearGradient id="lockerg" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#c8b0f0"/>
+    <stop offset="100%" stop-color="#b098e0"/>
+  </linearGradient>
+</defs>
+
+<!-- wall -->
+<rect width="680" height="240" fill="url(#wallhg)"/>
+<!-- wall dado rail -->
+<rect y="160" width="680" height="8" fill="#c8b0e8" opacity=".5"/>
+<rect y="158" width="680" height="4" fill="#d8c8f8" opacity=".4"/>
+<!-- lower wall panel -->
+<rect y="166" width="680" height="72" fill="#ede0ff" opacity=".5"/>
+<!-- floor -->
+<rect y="236" width="680" height="74" fill="url(#floorhg)"/>
+<!-- floor tiles -->
+<rect y="234" width="680" height="5" fill="#b8a0e0" opacity=".5"/>
+<line x1="0" y1="256" x2="680" y2="256" stroke="#c0a8e8" stroke-width="1" opacity=".4"/>
+<line x1="0" y1="276" x2="680" y2="276" stroke="#c0a8e8" stroke-width="1" opacity=".4"/>
+<line x1="0" y1="296" x2="680" y2="296" stroke="#c0a8e8" stroke-width="1" opacity=".4"/>
+<line x1="85" y1="234" x2="85" y2="310" stroke="#c0a8e8" stroke-width="1" opacity=".4"/>
+<line x1="170" y1="234" x2="170" y2="310" stroke="#c0a8e8" stroke-width="1" opacity=".4"/>
+<line x1="255" y1="234" x2="255" y2="310" stroke="#c0a8e8" stroke-width="1" opacity=".4"/>
+<line x1="340" y1="234" x2="340" y2="310" stroke="#c0a8e8" stroke-width="1" opacity=".4"/>
+<line x1="425" y1="234" x2="425" y2="310" stroke="#c0a8e8" stroke-width="1" opacity=".4"/>
+<line x1="510" y1="234" x2="510" y2="310" stroke="#c0a8e8" stroke-width="1" opacity=".4"/>
+<line x1="595" y1="234" x2="595" y2="310" stroke="#c0a8e8" stroke-width="1" opacity=".4"/>
+
+<!-- LEFT LOCKERS (detailed) -->
+<rect x="0" y="18" width="75" height="220" fill="url(#lockerg)"/>
+<!-- locker 1 top -->
+<rect x="5" y="25" width="65" height="98" rx="4" fill="#b898e0" stroke="#a080d0" stroke-width="1.5"/>
+<rect x="10" y="30" width="55" height="88" rx="3" fill="#c8b0f0" opacity=".5"/>
+<circle cx="37" cy="72" r="5" fill="#e8d8f8" stroke="#9878c8" stroke-width="1.5"/>
+<line x1="37" y1="72" x2="45" y2="72" stroke="#9878c8" stroke-width="1.5"/>
+<!-- locker 1 bottom -->
+<rect x="5" y="128" width="65" height="100" rx="4" fill="#b898e0" stroke="#a080d0" stroke-width="1.5"/>
+<rect x="10" y="133" width="55" height="90" rx="3" fill="#c8b0f0" opacity=".5"/>
+<circle cx="37" cy="175" r="5" fill="#e8d8f8" stroke="#9878c8" stroke-width="1.5"/>
+<line x1="37" y1="175" x2="45" y2="175" stroke="#9878c8" stroke-width="1.5"/>
+<!-- locker divider -->
+<rect x="0" y="120" width="75" height="6" fill="#9870c0"/>
+<!-- locker top frame -->
+<rect x="0" y="15" width="75" height="8" fill="#b090d8"/>
+<!-- name tags on lockers -->
+<rect x="12" y="45" width="51" height="16" rx="3" fill="#fff" opacity=".6"/>
+<rect x="12" y="148" width="51" height="16" rx="3" fill="#fff" opacity=".6"/>
+
+<!-- RIGHT LOCKERS -->
+<rect x="605" y="18" width="75" height="220" fill="url(#lockerg)"/>
+<rect x="610" y="25" width="65" height="98" rx="4" fill="#b898e0" stroke="#a080d0" stroke-width="1.5"/>
+<rect x="615" y="30" width="55" height="88" rx="3" fill="#c8b0f0" opacity=".5"/>
+<circle cx="643" cy="72" r="5" fill="#e8d8f8" stroke="#9878c8" stroke-width="1.5"/>
+<line x1="635" y1="72" x2="643" y2="72" stroke="#9878c8" stroke-width="1.5"/>
+<rect x="610" y="128" width="65" height="100" rx="4" fill="#b898e0" stroke="#a080d0" stroke-width="1.5"/>
+<rect x="615" y="133" width="55" height="90" rx="3" fill="#c8b0f0" opacity=".5"/>
+<circle cx="643" cy="175" r="5" fill="#e8d8f8" stroke="#9878c8" stroke-width="1.5"/>
+<line x1="635" y1="175" x2="643" y2="175" stroke="#9878c8" stroke-width="1.5"/>
+<rect x="605" y="120" width="75" height="6" fill="#9870c0"/>
+<rect x="605" y="15" width="75" height="8" fill="#b090d8"/>
+<rect x="617" y="45" width="51" height="16" rx="3" fill="#fff" opacity=".6"/>
+<rect x="617" y="148" width="51" height="16" rx="3" fill="#fff" opacity=".6"/>
+
+<!-- BULLETIN BOARD center top -->
+<rect x="140" y="16" width="400" height="140" rx="10" fill="#fff9f0" stroke="#d4aa50" stroke-width="2.5"/>
+<rect x="150" y="24" width="380" height="124" rx="6" fill="#fffbf5"/>
+<!-- corner pins -->
+<circle cx="152" cy="26" r="5" fill="#ff6060"/><circle cx="536" cy="26" r="5" fill="#60aaff"/>
+<circle cx="152" cy="142" r="5" fill="#60cc80"/><circle cx="536" cy="142" r="5" fill="#ffbb40"/>
+<!-- bulletin title banner -->
+<rect x="158" y="32" width="364" height="30" rx="8" fill="#ffd0e8"/>
+<text x="340" y="53" text-anchor="middle" font-size="16" fill="#cc4488" font-family="serif">🌸 礼貌之星公告栏 🌸</text>
+<!-- posted notes -->
+<rect x="162" y="70" width="88" height="60" rx="6" fill="#fffacd" transform="rotate(-2,206,100)"/>
+<text x="206" y="92" text-anchor="middle" font-size="10" fill="#8b7000">小言</text>
+<text x="206" y="108" text-anchor="middle" font-size="18">⭐</text>
+<text x="206" y="122" text-anchor="middle" font-size="9" fill="#8b7000">很有礼貌！</text>
+<rect x="260" y="66" width="88" height="60" rx="6" fill="#ffe4e4" transform="rotate(1.5,304,96)"/>
+<text x="304" y="88" text-anchor="middle" font-size="10" fill="#8b3030">小明</text>
+<text x="304" y="104" text-anchor="middle" font-size="18">💫</text>
+<text x="304" y="118" text-anchor="middle" font-size="9" fill="#8b3030">进步很大！</text>
+<rect x="358" y="68" width="88" height="60" rx="6" fill="#e4f5e4" transform="rotate(-1,402,98)"/>
+<text x="402" y="90" text-anchor="middle" font-size="10" fill="#2d6b2d">小红</text>
+<text x="402" y="106" text-anchor="middle" font-size="18">🌟</text>
+<text x="402" y="120" text-anchor="middle" font-size="9" fill="#2d6b2d">礼貌小天使！</text>
+<rect x="456" y="70" width="72" height="60" rx="6" fill="#e4eeff" transform="rotate(2,492,100)"/>
+<text x="492" y="92" text-anchor="middle" font-size="10" fill="#1a3a8b">小华</text>
+<text x="492" y="108" text-anchor="middle" font-size="18">✨</text>
+<text x="492" y="122" text-anchor="middle" font-size="9" fill="#1a3a8b">说话真好听！</text>
+
+<!-- Water fountain -->
+<rect x="88" y="195" width="44" height="40" rx="8" fill="#b8d8f8" stroke="#88b8e8" stroke-width="2"/>
+<rect x="93" y="185" width="34" height="16" rx="6" fill="#c8e4ff"/>
+<path d="M105,185 Q110,175 115,185" stroke="#60a0e0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<rect x="100" y="220" width="20" height="15" rx="4" fill="#a0c8f8"/>
+
+<!-- Hall window far -->
+<rect x="550" y="168" width="48" height="62" rx="5" fill="#c8eeff" stroke="#c0a040" stroke-width="2"/>
+<rect x="572" y="168" width="3" height="62" rx="1" fill="#c0a040"/>
+<rect x="550" y="197" width="48" height="3" rx="1" fill="#c0a040"/>
+<rect x="554" y="171" width="16" height="24" rx="2" fill="#b0deff"/>
+<rect x="576" y="171" width="18" height="24" rx="2" fill="#b0deff"/>
+<!-- shoes rack below window -->
+<rect x="547" y="228" width="55" height="10" rx="3" fill="#c8b880" opacity=".7"/>
+
+<!-- potted plant near lockers right -->
+<rect x="568" y="198" width="22" height="28" rx="6" fill="#e8a0c0"/>
+<ellipse cx="580" cy="195" rx="18" ry="14" fill="#5cb88a"/>
+<ellipse cx="565" cy="200" rx="12" ry="10" fill="#4aaa78"/>
+<ellipse cx="595" cy="200" rx="12" ry="10" fill="#4aaa78"/>
+<circle cx="574" cy="190" r="5" fill="#ff99cc"/>
+<circle cx="585" cy="186" r="4" fill="#ffbbdd"/>
+<circle cx="580" cy="194" r="3" fill="#ff80bb"/>
+`
+};
+
+// ═══════════════════════════════════════════════════
+//  CHARACTER DRAWINGS (hakoniwa-inspired style)
+// ═══════════════════════════════════════════════════
+function drawMom(mood) {
+  const blush = mood==='happy' ? `<ellipse cx="68" cy="145" rx="10" ry="6" fill="#ffb3c8" opacity=".55"/>
+    <ellipse cx="110" cy="145" rx="10" ry="6" fill="#ffb3c8" opacity=".55"/>` : '';
+  const mouth = mood==='happy' ? 'M68,155 Q89,168 110,155' :
+                mood==='sad'   ? 'M70,162 Q89,155 108,162' :
+                                 'M72,158 Q89,163 106,158';
+  const eyes = mood==='happy' ?
+    `<path d="M68,133 Q76,126 84,133" stroke="#5a2d8a" stroke-width="2.5" fill="none"/>
+     <path d="M94,133 Q102,126 110,133" stroke="#5a2d8a" stroke-width="2.5" fill="none"/>` :
+    `<ellipse cx="76" cy="133" rx="7" ry="8" fill="#5a2d8a"/>
+     <ellipse cx="102" cy="133" rx="7" ry="8" fill="#5a2d8a"/>
+     <ellipse cx="76" cy="132" rx="3.5" ry="4" fill="#3a1a6a"/>
+     <ellipse cx="102" cy="132" rx="3.5" ry="4" fill="#3a1a6a"/>
+     <circle cx="78" cy="129" r="2.5" fill="#fff"/>
+     <circle cx="104" cy="129" r="2.5" fill="#fff"/>`;
+  return `
+    <!-- shadow -->
+    <ellipse cx="100" cy="282" rx="55" ry="8" fill="#0003"/>
+    <!-- BODY - apron dress -->
+    <rect x="60" y="180" width="80" height="90" rx="20" fill="#ffb3d0"/>
+    <rect x="68" y="178" width="64" height="94" rx="16" fill="#ffc8de"/>
+    <!-- apron -->
+    <rect x="72" y="182" width="56" height="70" rx="12" fill="#fff5fa"/>
+    <!-- apron strings -->
+    <path d="M72,192 Q55,200 58,220" stroke="#ffb3d0" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M128,192 Q145,200 142,220" stroke="#ffb3d0" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- apron pocket -->
+    <rect x="82" y="225" width="36" height="22" rx="8" fill="#ffd8e8" stroke="#ffb3d0" stroke-width="1.5"/>
+    <path d="M90,236 Q100,241 110,236" stroke="#ffb3d0" stroke-width="1.5" fill="none"/>
+    <!-- buttons on apron -->
+    <circle cx="100" cy="195" r="3" fill="#ffb3d0"/>
+    <circle cx="100" cy="207" r="3" fill="#ffb3d0"/>
+    <!-- arms -->
+    <rect x="28" y="186" width="36" height="22" rx="11" fill="#ffe0f0" transform="rotate(20,46,197)"/>
+    <rect x="136" y="186" width="36" height="22" rx="11" fill="#ffe0f0" transform="rotate(-20,154,197)"/>
+    <!-- hands -->
+    <circle cx="30" cy="208" r="12" fill="#ffe8cc"/>
+    <circle cx="170" cy="208" r="12" fill="#ffe8cc"/>
+    <!-- legs -->
+    <rect x="68" y="262" width="22" height="22" rx="9" fill="#ffb3d0"/>
+    <rect x="110" y="262" width="22" height="22" rx="9" fill="#ffb3d0"/>
+    <!-- shoes -->
+    <ellipse cx="79" cy="283" rx="16" ry="7" fill="#c084e8"/>
+    <ellipse cx="121" cy="283" rx="16" ry="7" fill="#c084e8"/>
+    <!-- neck -->
+    <rect x="84" y="168" width="32" height="18" rx="8" fill="#ffe8cc"/>
+    <!-- HEAD -->
+    <ellipse cx="100" cy="128" rx="46" ry="44" fill="#ffe8cc"/>
+    <!-- HAIR back volume -->
+    <ellipse cx="100" cy="100" rx="46" ry="30" fill="#8b5cf6"/>
+    <!-- hair sides long -->
+    <rect x="52" y="105" width="22" height="65" rx="11" fill="#8b5cf6"/>
+    <rect x="126" y="105" width="22" height="65" rx="11" fill="#8b5cf6"/>
+    <!-- hair front/bangs -->
+    <path d="M58,115 Q65,92 80,98 Q90,88 100,92 Q110,88 120,98 Q135,92 142,115" fill="#8b5cf6"/>
+    <path d="M60,120 Q68,100 78,108" fill="#7c3aed" opacity=".7"/>
+    <path d="M140,120 Q132,100 122,108" fill="#7c3aed" opacity=".7"/>
+    <!-- hair highlight -->
+    <ellipse cx="88" cy="100" rx="12" ry="5" fill="#a78bfa" opacity=".5" transform="rotate(-15,88,100)"/>
+    <!-- hair clip -->
+    <ellipse cx="126" cy="105" rx="9" ry="5" fill="#ff99cc"/>
+    <ellipse cx="120" cy="102" rx="6" ry="4" fill="#ffbbdd"/>
+    <!-- EYES area -->
+    <ellipse cx="76" cy="133" rx="12" ry="13" fill="#fff"/>
+    <ellipse cx="102" cy="133" rx="12" ry="13" fill="#fff"/>
+    <!-- upper eyelid -->
+    <path d="M64,127 Q76,120 88,127" stroke="#5a2d8a" stroke-width="2" fill="#ffe8cc"/>
+    <path d="M90,127 Q102,120 114,127" stroke="#5a2d8a" stroke-width="2" fill="#ffe8cc"/>
+    ${eyes}
+    <!-- eyelashes -->
+    <path d="M65,126 Q69,120 73,123" stroke="#7c3aed" stroke-width="1.5" fill="none"/>
+    <path d="M91,126 Q95,120 99,123" stroke="#7c3aed" stroke-width="1.5" fill="none"/>
+    <path d="M87,126 Q85,119 80,122" stroke="#7c3aed" stroke-width="1.5" fill="none"/>
+    <path d="M113,126 Q111,119 106,122" stroke="#7c3aed" stroke-width="1.5" fill="none"/>
+    ${blush}
+    <!-- NOSE -->
+    <path d="M96,145 Q100,149 104,145" stroke="#f5a88a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <!-- MOUTH -->
+    <path d="${mouth}" stroke="#d4607a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- earrings -->
+    <circle cx="54" cy="132" r="4" fill="#ffccdd"/>
+    <circle cx="54" cy="138" r="3" fill="#ff99bb"/>
+    <circle cx="146" cy="132" r="4" fill="#ffccdd"/>
+    <circle cx="146" cy="138" r="3" fill="#ff99bb"/>
+  `;
+}
+
+function drawTeacher(mood) {
+  const blush = mood==='happy' ? `<ellipse cx="70" cy="147" rx="10" ry="6" fill="#b3c8ff" opacity=".5"/>
+    <ellipse cx="112" cy="147" rx="10" ry="6" fill="#b3c8ff" opacity=".5"/>` : '';
+  const mouth = mood==='happy' ? 'M70,158 Q91,170 112,158' :
+                mood==='sad'   ? 'M72,164 Q91,157 110,164' : 'M74,160 Q91,165 108,160';
+  const eyes = mood==='happy' ?
+    `<path d="M70,135 Q79,128 88,135" stroke="#1e3a8a" stroke-width="2.5" fill="none"/>
+     <path d="M96,135 Q105,128 114,135" stroke="#1e3a8a" stroke-width="2.5" fill="none"/>` :
+    `<ellipse cx="79" cy="135" rx="7" ry="8" fill="#1e3a8a"/>
+     <ellipse cx="105" cy="135" rx="7" ry="8" fill="#1e3a8a"/>
+     <ellipse cx="79" cy="134" rx="3.5" ry="4" fill="#0f1e50"/>
+     <ellipse cx="105" cy="134" rx="3.5" ry="4" fill="#0f1e50"/>
+     <circle cx="81" cy="131" r="2.5" fill="#fff"/>
+     <circle cx="107" cy="131" r="2.5" fill="#fff"/>`;
+  return `
+    <ellipse cx="100" cy="282" rx="55" ry="8" fill="#0003"/>
+    <!-- body - professional dress -->
+    <rect x="58" y="182" width="84" height="88" rx="20" fill="#93c5fd"/>
+    <rect x="65" y="180" width="70" height="92" rx="16" fill="#bfdbfe"/>
+    <!-- collar/jacket detail -->
+    <path d="M78,180 L100,200 L122,180" fill="#3b82f6" opacity=".6"/>
+    <!-- tie/ribbon -->
+    <path d="M94,182 L100,198 L106,182" fill="#fbbf24"/>
+    <ellipse cx="100" cy="182" rx="8" ry="4" fill="#fde68a"/>
+    <!-- jacket buttons -->
+    <circle cx="100" cy="212" r="3" fill="#60a0e0"/>
+    <circle cx="100" cy="226" r="3" fill="#60a0e0"/>
+    <circle cx="100" cy="240" r="3" fill="#60a0e0"/>
+    <!-- arms -->
+    <rect x="26" y="188" width="36" height="20" rx="10" fill="#bfdbfe" transform="rotate(18,44,198)"/>
+    <rect x="138" y="188" width="36" height="20" rx="10" fill="#bfdbfe" transform="rotate(-18,156,198)"/>
+    <!-- holding a book -->
+    <rect x="14" y="202" width="28" height="36" rx="4" fill="#fef3c7" stroke="#d4aa40" stroke-width="1.5"/>
+    <line x1="18" y1="210" x2="38" y2="210" stroke="#d4aa40" stroke-width="1.2" opacity=".5"/>
+    <line x1="18" y1="218" x2="38" y2="218" stroke="#d4aa40" stroke-width="1.2" opacity=".5"/>
+    <line x1="18" y1="226" x2="38" y2="226" stroke="#d4aa40" stroke-width="1.2" opacity=".5"/>
+    <!-- hand right waving -->
+    <circle cx="174" cy="205" r="13" fill="#ffe8cc"/>
+    <!-- legs -->
+    <rect x="68" y="264" width="22" height="22" rx="9" fill="#93c5fd"/>
+    <rect x="110" y="264" width="22" height="22" rx="9" fill="#93c5fd"/>
+    <!-- shoes black -->
+    <ellipse cx="79" cy="285" rx="16" ry="7" fill="#1e3a8a"/>
+    <ellipse cx="121" cy="285" rx="16" ry="7" fill="#1e3a8a"/>
+    <!-- neck -->
+    <rect x="84" y="168" width="32" height="18" rx="8" fill="#ffe8cc"/>
+    <!-- HEAD -->
+    <ellipse cx="100" cy="128" rx="46" ry="44" fill="#ffe8cc"/>
+    <!-- HAIR - neat bob style -->
+    <ellipse cx="100" cy="96" rx="46" ry="28" fill="#1e1b4b"/>
+    <ellipse cx="54" cy="120" rx="16" ry="30" fill="#1e1b4b"/>
+    <ellipse cx="146" cy="120" rx="16" ry="30" fill="#1e1b4b"/>
+    <path d="M56,112 Q65,88 80,94 Q90,86 100,90 Q110,86 120,94 Q135,88 144,112" fill="#1e1b4b"/>
+    <!-- hair highlight -->
+    <ellipse cx="86" cy="96" rx="14" ry="5" fill="#4a4580" opacity=".45" transform="rotate(-10,86,96)"/>
+    <!-- hair pin -->
+    <rect x="118" y="94" width="16" height="4" rx="2" fill="#fbbf24" transform="rotate(15,126,96)"/>
+    <circle cx="134" cy="92" r="5" fill="#f59e0b"/>
+    <!-- glasses -->
+    <rect x="62" y="127" width="28" height="18" rx="7" fill="none" stroke="#5a4a2a" stroke-width="2"/>
+    <rect x="94" y="127" width="28" height="18" rx="7" fill="none" stroke="#5a4a2a" stroke-width="2"/>
+    <line x1="90" y1="136" x2="94" y2="136" stroke="#5a4a2a" stroke-width="2"/>
+    <line x1="58" y1="136" x2="62" y2="136" stroke="#5a4a2a" stroke-width="1.5"/>
+    <line x1="122" y1="136" x2="128" y2="136" stroke="#5a4a2a" stroke-width="1.5"/>
+    <!-- EYES behind glasses -->
+    <ellipse cx="76" cy="135" rx="10" ry="10" fill="#fff"/>
+    <ellipse cx="108" cy="135" rx="10" ry="10" fill="#fff"/>
+    ${eyes}
+    ${blush}
+    <!-- NOSE -->
+    <path d="M96,147 Q100,151 104,147" stroke="#f5a88a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <!-- MOUTH -->
+    <path d="${mouth}" stroke="#d4607a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- earrings small pearl -->
+    <circle cx="54" cy="130" r="4" fill="#f8f4ff"/>
+    <circle cx="146" cy="130" r="4" fill="#f8f4ff"/>
+  `;
+}
+
+function drawFriend(mood) {
+  const blush = mood==='happy' ? `<ellipse cx="69" cy="143" rx="9" ry="5" fill="#ffcca0" opacity=".6"/>
+    <ellipse cx="109" cy="143" rx="9" ry="5" fill="#ffcca0" opacity=".6"/>` : '';
+  const mouth = mood==='happy' ? 'M70,153 Q89,165 108,153' :
+                mood==='sad'   ? 'M72,160 Q89,153 106,160' : 'M73,156 Q89,161 105,156';
+  const eyes = mood==='happy' ?
+    `<path d="M68,130 Q78,122 88,130" stroke="#92400e" stroke-width="2.5" fill="none"/>
+     <path d="M92,130 Q102,122 112,130" stroke="#92400e" stroke-width="2.5" fill="none"/>` :
+    `<ellipse cx="78" cy="130" rx="7" ry="8" fill="#92400e"/>
+     <ellipse cx="100" cy="130" rx="7" ry="8" fill="#92400e"/>
+     <ellipse cx="78" cy="129" rx="3.5" ry="4" fill="#5a2010"/>
+     <ellipse cx="100" cy="129" rx="3.5" ry="4" fill="#5a2010"/>
+     <circle cx="80" cy="126" r="2.5" fill="#fff"/>
+     <circle cx="102" cy="126" r="2.5" fill="#fff"/>`;
+  return `
+    <ellipse cx="96" cy="282" rx="52" ry="8" fill="#0003"/>
+    <!-- body - casual school uniform look -->
+    <rect x="55" y="180" width="82" height="88" rx="20" fill="#a3e4b8"/>
+    <rect x="62" y="178" width="68" height="92" rx="16" fill="#bbf0cc"/>
+    <!-- school uniform stripe -->
+    <rect x="62" y="190" width="68" height="6" rx="3" fill="#5cb88a" opacity=".5"/>
+    <rect x="62" y="204" width="68" height="6" rx="3" fill="#5cb88a" opacity=".5"/>
+    <!-- pocket with pencil -->
+    <rect x="80" y="220" width="32" height="22" rx="6" fill="#8ee8b0" stroke="#5cb88a" stroke-width="1.5"/>
+    <line x1="88" y1="218" x2="86" y2="208" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- arms -->
+    <rect x="24" y="185" width="36" height="20" rx="10" fill="#bbf0cc" transform="rotate(22,42,195)"/>
+    <rect x="132" y="185" width="36" height="20" rx="10" fill="#bbf0cc" transform="rotate(-22,150,195)"/>
+    <!-- holding pencil case (crayon box!) -->
+    <rect x="10" y="198" width="32" height="22" rx="5" fill="#fbbf24"/>
+    <rect x="12" y="200" width="28" height="8" rx="3" fill="#f59e0b"/>
+    <!-- crayons sticking out -->
+    <rect x="14" y="192" width="6" height="12" rx="2" fill="#ef4444"/>
+    <rect x="22" y="190" width="6" height="14" rx="2" fill="#3b82f6"/>
+    <rect x="30" y="193" width="6" height="11" rx="2" fill="#10b981"/>
+    <!-- hand right -->
+    <circle cx="168" cy="200" r="12" fill="#ffe8cc"/>
+    <!-- legs -->
+    <rect x="64" y="260" width="22" height="24" rx="9" fill="#a3e4b8"/>
+    <rect x="102" y="260" width="22" height="24" rx="9" fill="#a3e4b8"/>
+    <!-- shoes -->
+    <ellipse cx="75" cy="283" rx="15" ry="7" fill="#f59e0b"/>
+    <ellipse cx="113" cy="283" rx="15" ry="7" fill="#f59e0b"/>
+    <!-- neck -->
+    <rect x="82" y="166" width="28" height="18" rx="8" fill="#ffe8cc"/>
+    <!-- HEAD -->
+    <ellipse cx="96" cy="122" rx="44" ry="42" fill="#ffe8cc"/>
+    <!-- HAIR - playful spiky/wavy -->
+    <ellipse cx="96" cy="92" rx="44" ry="28" fill="#f59e0b"/>
+    <ellipse cx="52" cy="114" rx="15" ry="28" fill="#f59e0b"/>
+    <ellipse cx="140" cy="114" rx="15" ry="28" fill="#f59e0b"/>
+    <path d="M54,108 Q62,82 76,90 Q86,80 96,84 Q106,80 116,90 Q130,82 138,108" fill="#f59e0b"/>
+    <!-- spiky hair tufts -->
+    <path d="M66,84 Q72,66 80,80" fill="#f59e0b"/>
+    <path d="M90,78 Q96,60 102,78" fill="#f59e0b"/>
+    <path d="M116,84 Q122,66 128,82" fill="#f59e0b"/>
+    <!-- hair highlight -->
+    <ellipse cx="84" cy="90" rx="12" ry="4" fill="#fcd34d" opacity=".6" transform="rotate(-15,84,90)"/>
+    <!-- star clip -->
+    <polygon points="142,90 144,84 146,90 152,90 147,94 149,100 144,96 139,100 141,94 136,90" fill="#fbbf24" transform="scale(0.7) translate(55,42)"/>
+    <!-- actually simple star -->
+    <circle cx="137" cy="88" r="7" fill="#fde68a"/>
+    <text x="137" y="92" text-anchor="middle" font-size="10" fill="#f59e0b">★</text>
+    <!-- EYES -->
+    <ellipse cx="78" cy="130" rx="12" ry="13" fill="#fff"/>
+    <ellipse cx="100" cy="130" rx="12" ry="13" fill="#fff"/>
+    <path d="M66,124 Q78,116 90,124" stroke="#92400e" stroke-width="2" fill="#ffe8cc"/>
+    <path d="M88,124 Q100,116 112,124" stroke="#92400e" stroke-width="2" fill="#ffe8cc"/>
+    ${eyes}
+    <!-- eyelashes -->
+    <path d="M67,122 Q71,116 76,119" stroke="#b45309" stroke-width="1.5" fill="none"/>
+    <path d="M89,122 Q93,116 98,119" stroke="#b45309" stroke-width="1.5" fill="none"/>
+    ${blush}
+    <!-- freckles -->
+    <circle cx="65" cy="143" r="2" fill="#f5a88a" opacity=".5"/>
+    <circle cx="72" cy="147" r="1.5" fill="#f5a88a" opacity=".5"/>
+    <circle cx="120" cy="143" r="2" fill="#f5a88a" opacity=".5"/>
+    <circle cx="127" cy="147" r="1.5" fill="#f5a88a" opacity=".5"/>
+    <!-- NOSE -->
+    <path d="M92,143 Q96,147 100,143" stroke="#f5a88a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <!-- MOUTH -->
+    <path d="${mouth}" stroke="#d4607a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  `;
+}
+
+const CHARS = { mom: drawMom, teacher: drawTeacher, friend: drawFriend };
+
+// ═══════════════════════════════════════════════════
+//  SCENE DATA
+// ═══════════════════════════════════════════════════
+const SCENES = [
+  {
+    id:'home', tag:'🏠 场景一：早晨的餐桌', bg:'home', npcType:'mom',
+    steps:[
+      {speaker:'旁白',icon:'📖',text:'你揉着眼睛走出卧室，阳光透过窗帘洒在餐桌上。妈妈正在厨房里忙活，锅里煎着鸡蛋，香味飘满了整个房间……'},
+      {speaker:'妈妈',icon:'👩',text:'哎呀，$NAME起得正好！鸡蛋马上就好，你先喝粥。对了——你能帮妈妈把冰箱里的牛奶拿出来吗？妈妈手上有油。'},
+      {speaker:'$NAME心想',icon:'💭',text:'妈妈让我帮忙……可是我的书包带子松了，我想请妈妈帮我缝一下。要用"请……好吗？"来问！'},
+    ],
+    task:'用「请……好吗？」请妈妈帮你缝书包带子',
+    options:[
+      {text:'A. "妈妈，请帮我缝一下书包带子好吗？"',correct:true},
+      {text:'B. "妈妈你帮我缝书包带子，快点。"',correct:false,hint:'妈妈停下手中的锅铲说："这样说话妈妈心里不太舒服哦。如果换成你，别人这样对你说话，你是什么感觉？用「请……好吗？」再说一次试试？"'},
+      {text:'C. "我的书包带子松了，请帮我缝一下。"',correct:false,hint:'妈妈歪了歪头说："你说了「请」，很棒！可是结尾好像还少了一个礼貌的小尾巴。加上「好吗」让这句话更完整好吗？"'},
+    ],
+    successMsg:'当然好呀！听到你这样说话，妈妈再忙也愿意帮你。先喝粥，吃完妈妈就给你缝，保证你背着漂漂亮亮的书包去上学！',
+    successSpeaker:'妈妈'
+  },
+  {
+    id:'class', tag:'📚 场景二：上午的教室', bg:'classroom', npcType:'teacher',
+    steps:[
+      {speaker:'旁白',icon:'📖',text:'你背着书包走进教室，第一节是语文课。你把课本拿出来，却发现——糟了，橡皮昨天借给同桌小美，小美今天请假！'},
+      {speaker:'王老师',icon:'👩‍🏫',text:'$NAME，你的橡皮呢？这节课我们要用橡皮改错字哦。有什么需要老师帮忙的吗？'},
+      {speaker:'$NAME心想',icon:'💭',text:'我需要请老师借我一块橡皮。要用「请……好吗？」来问，这样才有礼貌！'},
+    ],
+    task:'用「请……好吗？」请老师借你一块橡皮',
+    options:[
+      {text:'A. "老师，请借我一块橡皮好吗？"',correct:true},
+      {text:'B. "老师，我橡皮没了，你给我一个。"',correct:false,hint:'王老师微微叹了口气说："这样直接要东西的方式，老师觉得不太合适。如果别的同学这样对你说话，你会开心吗？用「请……好吗？」重新试一次，老师相信你！"'},
+      {text:'C. "老师请借我橡皮，快点好吗？"',correct:false,hint:'王老师轻轻摇头说："你说了「请」和「好吗」，这很好！但「快点好吗」听起来像在催促。试试把「快点」去掉，温柔地请求老师好吗？"'},
+    ],
+    successMsg:'多有礼貌的孩子呀！当然可以，老师这里正好有一块备用的。下次记得提前准备好文具哦～',
+    successSpeaker:'王老师'
+  },
+  {
+    id:'hall', tag:'🤝 场景三：课间的走廊', bg:'hallway', npcType:'friend',
+    steps:[
+      {speaker:'旁白',icon:'📖',text:'下课铃响了！走廊上，同学小杰正拿着一盒新彩笔，颜色特别漂亮。下节美术课，你忘带彩笔了……'},
+      {speaker:'小杰',icon:'👦',text:'嗨$NAME！你一直看我的彩笔，是不是想用啊？这可是我生日刚收到的限量版哦！'},
+      {speaker:'$NAME心想',icon:'💭',text:'小杰好像挺宝贝这盒彩笔的，我要特别礼貌地用「请……好吗？」来问！'},
+    ],
+    task:'用「请……好吗？」请小杰借你几支彩笔',
+    options:[
+      {text:'A. "小杰，请借我几支彩笔用一下好吗？我会很小心的！"',correct:true},
+      {text:'B. "小杰借我彩笔，我美术课要用。"',correct:false,hint:'小杰把彩笔盒往怀里一收说："你连「请」和「好吗」都不说，我感觉不太被尊重呢。要不，换种方式再说一次？"'},
+      {text:'C. "你这个彩笔真好看，请借我一下好吗——不借就算了。"',correct:false,hint:'小杰皱了皱眉说："前半句还挺好！可是后面「不借就算了」听起来像在赌气……你能真诚地、不带情绪地用「请……好吗？」再说一次吗？"'},
+    ],
+    successMsg:'没问题！你这么有礼貌，我当然放心借给你啦！来，你挑几支喜欢的颜色，记得下课还我就行！',
+    successSpeaker:'小杰'
+  }
+];
+
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let G = {
+  name:'小言', sceneIdx:0, stepIdx:0,
+  tries:0, recognition:null, voiceOk:false, listening:false,
+  currentText:''
+};
+
+// ═══════════════════════════════════════════════════
+//  SPEECH
+// ═══════════════════════════════════════════════════
+function initSpeech(){
+  G.voiceOk = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  // 预加载声音列表，浏览器需要时间初始化
+  if(window.speechSynthesis){
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = ()=> window.speechSynthesis.getVoices();
+  }
+}
+
+function getBestVoice(){
+  const voices = window.speechSynthesis.getVoices();
+  // 优先级：晓晓 > 其他微软中文 > 任何zh-CN > 任何zh
+  const priority = [
+    v => v.name.includes('Xiaoxiao') || v.name.includes('晓晓'),
+    v => v.name.includes('Microsoft') && v.lang.startsWith('zh'),
+    v => v.lang === 'zh-CN',
+    v => v.lang.startsWith('zh'),
+  ];
+  for(const test of priority){
+    const found = voices.find(test);
+    if(found) return found;
+  }
+  return null;
+}
+
+function speak(text){
+  if(!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text.replace(/\$NAME/g, G.name));
+  u.lang='zh-CN'; u.rate=0.85; u.pitch=1.05;
+  const voice = getBestVoice();
+  if(voice) u.voice = voice;
+  const btn = document.getElementById('speakbtn');
+  u.onstart = ()=>{ if(btn) btn.className='speaking'; };
+  u.onend = ()=>{ if(btn) btn.className=''; };
+  window.speechSynthesis.speak(u);
+}
+
+function typeText(el, text, cb){
+  const t = text.replace(/\$NAME/g, G.name);
+  G.currentText = t;
+  el.textContent = '';
+  let i = 0;
+  const iv = setInterval(()=>{
+    el.textContent += t[i++];
+    if(i >= t.length){ clearInterval(iv); if(cb) setTimeout(cb, 200); }
+  }, 38);
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER HELPERS
+// ═══════════════════════════════════════════════════
+function updateProgress(){
+  [0,1,2].forEach(i=>{
+    const d = document.getElementById('pd'+i);
+    d.className = 'pdot' + (i<G.sceneIdx?' done': i===G.sceneIdx?' active':'');
+  });
+}
+
+function setChar(type, mood){
+  document.getElementById('charsvg').innerHTML = CHARS[type](mood);
+}
+
+function showScene(){
+  const sc = SCENES[G.sceneIdx];
+  document.getElementById('scenetag').textContent = sc.tag;
+  document.getElementById('scenesvg').innerHTML = BACKGROUNDS[sc.bg];
+  setChar(sc.npcType, 'neutral');
+  updateProgress();
+  G.stepIdx = 0;
+  G.tries = 0;
+  showStep();
+}
+
+const SPEAKER_ICONS = {
+  '旁白':'📖','妈妈':'👩','王老师':'👩‍🏫','小杰':'👦'
+};
+function speakerIcon(name){ return SPEAKER_ICONS[name]||'💭'; }
+
+function showStep(){
+  const sc = SCENES[G.sceneIdx];
+  const step = sc.steps[G.stepIdx];
+  hide('choicewrap'); hide('voicewrap'); hide('feedbackwrap'); hide('nextbtn');
+
+  const badge = document.getElementById('npcnamebadge');
+  const speaker = step.speaker.replace(/\$NAME/g, G.name);
+  badge.textContent = (step.icon||speakerIcon(step.speaker)) + ' ' + speaker;
+  badge.style.background = step.speaker.includes('心想')
+    ? 'linear-gradient(135deg,#fff9c7,#fffacd)'
+    : step.speaker==='旁白'
+      ? 'linear-gradient(135deg,#f3f4f6,#e5e7eb)'
+      : 'linear-gradient(135deg,#ede8ff,#dff0ff)';
+  badge.style.color = step.speaker.includes('心想') ? '#92400e'
+    : step.speaker==='旁白' ? '#374151' : 'var(--dpurple)';
+
+  const dt = document.getElementById('dialogtext');
+  typeText(dt, step.text, ()=>{
+    speak(step.text);
+    const nb = document.getElementById('nextbtn');
+    nb.style.display = 'inline-block';
+    const isLast = G.stepIdx >= sc.steps.length-1;
+    nb.textContent = isLast ? '做出选择 ✨' : '继续 ▶';
+    nb.onclick = ()=>{
+      if(isLast) showChoices();
+      else { G.stepIdx++; showStep(); }
+    };
+  });
+}
+
+function showChoices(){
+  const sc = SCENES[G.sceneIdx];
+  hide('nextbtn');
+  document.getElementById('npcnamebadge').textContent = '💬 你会怎么说？';
+  document.getElementById('npcnamebadge').style.background = 'linear-gradient(135deg,#fef3c7,#fde68a)';
+  document.getElementById('npcnamebadge').style.color = '#92400e';
+  document.getElementById('dialogtext').textContent = sc.task;
+
+  const cw = document.getElementById('choicewrap');
+  cw.style.display = 'flex';
+  sc.options.forEach((o,i)=>{
+    const b = document.getElementById('cb'+i);
+    b.textContent = o.text;
+    b.className = 'cbtn';
+    b.disabled = false;
+    b.onclick = ()=> handleChoice(i);
+  });
+  show('voicewrap');
+  document.getElementById('voiceinp').value = '';
+  document.getElementById('micstatus').textContent = G.voiceOk
+    ? '点击 🎙 让孩子说出礼貌的话，或直接打字' : '（请在文本框输入回答）';
+}
+
+function checkAnswer(text){
+  const t = text.trim();
+  return t.includes('请') && t.includes('好吗') && t.length > 4;
+}
+
+function handleChoice(i){
+  const sc = SCENES[G.sceneIdx];
+  const o = sc.options[i];
+  document.querySelectorAll('.cbtn').forEach(b=>{ b.disabled=true; b.onclick=null; });
+  document.getElementById('cb'+i).className = 'cbtn ' + (o.correct?'correct':'wrong');
+  if(o.correct) doSuccess();
+  else { G.tries++; doFail(o.hint); }
+}
+
+function handleFreeInput(text){
+  if(!text.trim()) return;
+  const sc = SCENES[G.sceneIdx];
+  if(checkAnswer(text)){
+    doSuccess();
+  } else {
+    G.tries++;
+    let hint='';
+    const hasPls=text.includes('请'), hasHm=text.includes('好吗');
+    if(!hasPls&&!hasHm) hint='好像少了"请"和"好吗"这两个礼貌词哦！';
+    else if(!hasPls) hint='好像少了"请"字。加上它，让请求更有礼貌～';
+    else hint='结尾要加上"好吗"，这是礼貌请求的关键词哦！';
+    if(G.tries>=3) hint += ' 来跟着说：「请……好吗？」👆';
+    const npcName = sc.id==='home' ? '妈妈' : sc.id==='class' ? '王老师' : '小杰';
+    doFail(npcName + '说："' + hint + '"');
+  }
+}
+
+function doFail(msg){
+  const sc = SCENES[G.sceneIdx];
+  setChar(sc.npcType, 'sad');
+  hide('voicewrap');
+  const fb = document.getElementById('feedbackwrap');
+  fb.className = 'fail';
+  fb.innerHTML = '<span class="feedback-icon">⚠️</span>' + msg;
+  fb.style.display = 'block';
+  speak(msg);
+  const nb = document.getElementById('nextbtn');
+  nb.style.display = 'inline-block';
+  nb.textContent = '← 再试一次';
+  nb.style.background = 'linear-gradient(135deg,#d97706,#f59e0b)';
+  nb.onclick = ()=>{
+    fb.style.display='none';
+    nb.style.background='';
+    setChar(sc.npcType,'neutral');
+    showChoices();
+  };
+}
+
+function doSuccess(){
+  const sc = SCENES[G.sceneIdx];
+  setChar(sc.npcType, 'happy');
+  hide('choicewrap'); hide('voicewrap');
+  const fb = document.getElementById('feedbackwrap');
+  fb.className = 'success';
+  fb.innerHTML = `<span class="feedback-icon">✅</span><strong>礼貌魔法成功！</strong><br>${sc.successSpeaker}说："${sc.successMsg}"`;
+  fb.style.display = 'block';
+  speak(sc.successMsg);
+  document.getElementById('npcnamebadge').textContent = '🌟 ' + sc.successSpeaker;
+
+  const nb = document.getElementById('nextbtn');
+  nb.style.display = 'inline-block';
+  nb.style.background = '';
+  nb.textContent = G.sceneIdx < SCENES.length-1 ? '进入下一个场景 ➜' : '查看成绩单 🎉';
+  nb.onclick = ()=>{
+    if(G.sceneIdx < SCENES.length-1){
+      G.sceneIdx++;
+      fb.style.display='none';
+      showScene();
+    } else {
+      showSummary();
+    }
+  };
+}
+
+function showSummary(){
+  document.getElementById('game').style.display = 'none';
+  const sum = document.getElementById('summary');
+  sum.style.display = 'flex';
+  const cards = document.getElementById('sumcards');
+  cards.innerHTML = '';
+  SCENES.forEach(sc=>{
+    const d = document.createElement('div');
+    d.className = 'sum-card';
+    d.innerHTML = `<div class="sum-check">✓</div><span>${sc.tag} — 通过！</span>`;
+    cards.appendChild(d);
+  });
+}
+
+function initRecognition(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR) return null;
+  const r = new SR();
+  r.lang='zh-CN'; r.continuous=false; r.interimResults=false;
+  r.onresult = e=>{
+    const t = e.results[0][0].transcript;
+    const inp=document.getElementById('voiceinp');
+    const st=document.getElementById('micstatus');
+    const mb=document.getElementById('micbtn');
+    if(inp) inp.value = t;
+    if(st) st.textContent='✅ 听到了：' + t;
+    if(mb) mb.className='';
+    G.listening=false;
+    setTimeout(()=> handleFreeInput(t), 300);
+  };
+  r.onerror = e=>{
+    const st=document.getElementById('micstatus');
+    const mb=document.getElementById('micbtn');
+    G.listening=false;
+    if(mb) mb.className='';
+    if(e.error==='no-speech') {
+      if(st) st.textContent='没听到声音，请再试一次 🎙';
+    } else if(e.error==='not-allowed'){
+      if(st) st.textContent='麦克风被拒绝，请在浏览器设置里允许';
+    } else {
+      if(st) st.textContent='出错了(' + e.error + ')，请再试一次 🎙';
+    }
+  };
+  r.onend = ()=>{
+    G.listening=false;
+    const mb=document.getElementById('micbtn');
+    if(mb) mb.className='';
+  };
+  return r;
+}
+
+function toggleMic(){
+  const mb=document.getElementById('micbtn');
+  const st=document.getElementById('micstatus');
+  if(G.listening && G.recognition){
+    G.recognition.stop();
+    G.listening=false;
+    if(mb) mb.className='';
+    if(st) st.textContent='已停止';
+    return;
+  }
+  // 每次重新创建，避免状态残留
+  G.recognition = initRecognition();
+  if(!G.recognition){
+    if(st) st.textContent='此浏览器不支持语音识别，请用Chrome';
+    return;
+  }
+  G.listening=true;
+  if(mb) mb.className='listening';
+  if(st) st.textContent='🔴 正在听……请说话';
+  try{
+    G.recognition.start();
+  } catch(e){
+    G.listening=false;
+    if(mb) mb.className='';
+    if(st) st.textContent='启动失败，请再点一次 🎙';
+  }
+}
+
+function show(id){
+  const el=document.getElementById(id);
+  el.style.display=(id==='choicewrap')?'flex':'block';
+}
+function hide(id){ document.getElementById(id).style.display='none'; }
+
+// ═══════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════
+initSpeech();
+
+document.getElementById('startbtn').onclick = ()=>{
+  G.name = document.getElementById('nameinp').value.trim() || '小言';
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('game').style.display = 'flex';
+  showScene();
+};
+document.getElementById('nameinp').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('startbtn').click(); });
+
+document.getElementById('speakbtn').onclick = ()=>{ speak(G.currentText); };
+document.getElementById('micbtn').onclick = toggleMic;
+document.getElementById('submbtn').onclick = ()=> handleFreeInput(document.getElementById('voiceinp').value);
+document.getElementById('voiceinp').addEventListener('keydown', e=>{ if(e.key==='Enter') handleFreeInput(e.target.value); });
+document.getElementById('restartbtn').onclick = ()=>{
+  G.sceneIdx=0; G.stepIdx=0; G.tries=0;
+  document.getElementById('summary').style.display='none';
+  document.getElementById('feedbackwrap').style.display='none';
+  document.getElementById('game').style.display='flex';
+  showScene();
+};
+</script>
+</body>
+</html>
