@@ -1196,15 +1196,37 @@ let G = {
 //  SPEECH
 // ═══════════════════════════════════════════════════
 function initSpeech(){
-  // recognition now created fresh on each mic click via initRecognition()
   G.voiceOk = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  // 预加载声音列表，浏览器需要时间初始化
+  if(window.speechSynthesis){
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = ()=> window.speechSynthesis.getVoices();
+  }
+}
+
+function getBestVoice(){
+  const voices = window.speechSynthesis.getVoices();
+  // 优先级：晓晓 > 其他微软中文 > 任何zh-CN > 任何zh
+  const priority = [
+    v => v.name.includes('Xiaoxiao') || v.name.includes('晓晓'),
+    v => v.name.includes('Microsoft') && v.lang.startsWith('zh'),
+    v => v.lang === 'zh-CN',
+    v => v.lang.startsWith('zh'),
+  ];
+  for(const test of priority){
+    const found = voices.find(test);
+    if(found) return found;
+  }
+  return null;
 }
 
 function speak(text){
   if(!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text.replace(/\$NAME/g, G.name));
-  u.lang='zh-CN'; u.rate=0.88; u.pitch=1.05;
+  u.lang='zh-CN'; u.rate=0.85; u.pitch=1.05;
+  const voice = getBestVoice();
+  if(voice) u.voice = voice;
   const btn = document.getElementById('speakbtn');
   u.onstart = ()=>{ if(btn) btn.className='speaking'; };
   u.onend = ()=>{ if(btn) btn.className=''; };
