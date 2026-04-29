@@ -1337,7 +1337,8 @@ function handleFreeInput(text){
     else if(!hasPls) hint='好像少了"请"字。加上它，让请求更有礼貌～';
     else hint='结尾要加上"好吗"，这是礼貌请求的关键词哦！';
     if(G.tries>=3) hint += ' 来跟着说：「请……好吗？」👆';
-    doFail(`${sc.options[0].text.includes(sc.npcType)?'':sc.id==='home'?'妈妈':sc.id==='class'?'王老师':'小杰'}说："${hint}"`);
+    const npcName = sc.id==='home' ? '妈妈' : sc.id==='class' ? '王老师' : '小杰';
+    doFail(npcName + '说："' + hint + '"');
   }
 }
 
@@ -1418,9 +1419,10 @@ function toggleMic(){
     const t = e.results[0][0].transcript;
     inp.value = t;
     G.listening=false; mb.className='';
-    st.textContent='识别结果：' + t;
+    st.textContent='✅ 识别成功：' + t + '　（正在判断…）';
+    setTimeout(()=> handleFreeInput(t), 500);
   };
-  G.recognition.onerror = ()=>{ G.listening=false; mb.className=''; st.textContent='识别失败，请重试'; };
+  G.recognition.onerror = ()=>{ G.listening=false; mb.className=''; st.textContent='没听清，请再试一次 🎙'; };
   G.recognition.onend = ()=>{ G.listening=false; mb.className=''; };
   G.recognition.start();
 }
